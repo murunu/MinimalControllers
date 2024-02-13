@@ -1,8 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B50BB998-10C1-419C-8C4C-F26490259B0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAotExample", "NativeAotExample\NativeAotExample.csproj", "{13C531B9-FB25-467F-98CE-F8EB4A1DF02A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{256E384C-D674-4CEA-913E-E32666AEEBC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13C531B9-FB25-467F-98CE-F8EB4A1DF02A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13C531B9-FB25-467F-98CE-F8EB4A1DF02A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13C531B9-FB25-467F-98CE-F8EB4A1DF02A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13C531B9-FB25-467F-98CE-F8EB4A1DF02A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{256E384C-D674-4CEA-913E-E32666AEEBC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{256E384C-D674-4CEA-913E-E32666AEEBC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{256E384C-D674-4CEA-913E-E32666AEEBC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{256E384C-D674-4CEA-913E-E32666AEEBC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{13C531B9-FB25-467F-98CE-F8EB4A1DF02A} = {B50BB998-10C1-419C-8C4C-F26490259B0D}
+		{256E384C-D674-4CEA-913E-E32666AEEBC9} = {B50BB998-10C1-419C-8C4C-F26490259B0D}
 	EndGlobalSection
 EndGlobal
