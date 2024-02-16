@@ -1,9 +1,9 @@
-﻿using MinimalControllers;
+﻿using Microsoft.AspNetCore.Mvc;
 using NativeAotExample.Model;
 
 namespace NativeAotExample.Controllers;
 
-[ApiController]
+[MinimalControllers.ApiController]
 public class TestController : Microsoft.AspNetCore.Mvc.Controller
 {
     public TestController(ILogger<TestController> logger, WeatherForecast weatherForecast)
@@ -11,19 +11,19 @@ public class TestController : Microsoft.AspNetCore.Mvc.Controller
         
     }
     
-    [HttpGet]
-    public async Task<string> Test()
+    [MinimalControllers.HttpGet]
+    public async Task<IActionResult> Test(string test)
     {
-        return "Hello World!";
+        return Ok(test);
     }
     
-    [HttpGet]
+    [MinimalControllers.HttpGet]
     public async Task<string> Test2()
     {
         return "Hello World!";
     }
 
-    [HttpPut]
+    [MinimalControllers.HttpPut]
     public async Task<string> Test3()
     {
         return "";

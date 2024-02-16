@@ -48,15 +48,9 @@ public class MinimalControllersGenerator : IIncrementalGenerator
             .SelectMany(attributeListSyntax => attributeListSyntax.Attributes)
             .Any(attributeSyntax => HttpAttributeDefinitions
                 .ControllerTypesWithNamespace
-                .Where(x =>
-                {
-                    NamespaceHelper.GetNamespace(context.SemanticModel, attributeSyntax);
-
-                    return true;
-                })
                 .Any(name =>
                     name
-                        .Equals(attributeSyntax.Name.ToString())))
+                        .Equals(NamespaceHelper.GetNamespace(context.SemanticModel, attributeSyntax))))
             ? (classDeclarationSyntax, true)
             : (classDeclarationSyntax, false);
     }
@@ -74,19 +68,21 @@ public class MinimalControllersGenerator : IIncrementalGenerator
             if (string.IsNullOrEmpty(controllerName))
                 continue;
 
-            var methods = GetHttpMethods(classDeclarationSyntax);
+            var methods = GetHttpMethods(compilation, classDeclarationSyntax);
 
             source.AddGroup(controllerName);
 
             foreach (var method in methods)
             {
+                var methodArguments = GetMethodArguments(method.Key).ToList();
                 foreach (var httpMethod in method.Value)
                 {
                     source.AddEndpoint(
                         httpMethod, 
-                        $"/{method.Key}", 
-                        method.Key,
-                        controllerServices);
+                        $"/{method.Key.Identifier.Text}", 
+                        method.Key.Identifier.Text,
+                        controllerServices,
+                        methodArguments);
                 }
             }
         }
@@ -101,18 +97,15 @@ public class MinimalControllersGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<string> GetControllerServices(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        // Get constructor arguments.
-        return classDeclarationSyntax
+        => classDeclarationSyntax
             .Members
             .OfType<ConstructorDeclarationSyntax>()
             .SelectMany(constructor => constructor.ParameterList.Parameters)
             .Select(parameter => NamespaceHelper.GetNamespace(compilation, parameter));
-    }
 
-    private static string GetControllerEndpoint(ClassDeclarationSyntax classDeclarationSyntax, string argumentName)
+    private static string GetControllerEndpoint(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, string argumentName)
     {
-        foreach (var attribute in GetAttributesByList(classDeclarationSyntax, HttpAttributeDefinitions.ControllerTypes))
+        foreach (var attribute in GetAttributesByList(compilation, classDeclarationSyntax, HttpAttributeDefinitions.ControllerTypes))
         {
             if (attribute.ArgumentList == null)
                 continue;
@@ -132,22 +125,28 @@ public class MinimalControllersGenerator : IIncrementalGenerator
         return null;
     }
 
-    private static Dictionary<string, string[]> GetHttpMethods(TypeDeclarationSyntax classDeclarationSyntax)
+    private static Dictionary<MethodDeclarationSyntax, string[]> GetHttpMethods(Compilation compilation, TypeDeclarationSyntax classDeclarationSyntax)
         => classDeclarationSyntax.Members.OfType<MethodDeclarationSyntax>()
             .Select(method => new
             {
                 Method = method,
-                HttpMethods = GetAttributesByList(method, HttpAttributeDefinitions.HttpMethodsWithNamespace)
+                HttpMethods = GetAttributesByList(compilation, method, HttpAttributeDefinitions.HttpMethodsWithNamespace)
             })
             .Where(x => x.HttpMethods.Any())
             .ToDictionary(
-                x => x.Method.Identifier.Text,
+                x => x.Method,
                 x => x.HttpMethods
                     .Select(y => y.Name
                         .ToString().Replace("Http", ""))
                     .ToArray());
+    
+    private static IEnumerable<string> GetMethodArguments(BaseMethodDeclarationSyntax method)
+        => method
+            .ParameterList
+            .Parameters
+            .Select(parameter => parameter.Type.ToString());
 
-    private static IEnumerable<AttributeSyntax> GetAttributesByList(MemberDeclarationSyntax classDeclarationSyntax,
+    private static IEnumerable<AttributeSyntax> GetAttributesByList(Compilation compilation, MemberDeclarationSyntax classDeclarationSyntax,
         IEnumerable<string> names)
         => classDeclarationSyntax
             .AttributeLists
@@ -156,6 +155,5 @@ public class MinimalControllersGenerator : IIncrementalGenerator
                 names.Any(
                     name =>
                         name.Equals(
-                            attribute.ToFullString()
-                                .ToString())));
+                            NamespaceHelper.GetNamespace(compilation, attribute))));
 }

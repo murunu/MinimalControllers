@@ -33,7 +33,8 @@ public class MinimalApiClassBuilder
         string httpMethod, 
         string endpoint, 
         string methodName,
-        IEnumerable<string> controllerServices)
+        List<string> controllerServices,
+        List<string> methodArguments)
     {
         
         if(string.IsNullOrEmpty(_currentController))
@@ -41,29 +42,21 @@ public class MinimalApiClassBuilder
 
         var services = controllerServices.ToDictionary(
             x => x,
-            x =>
-            {
-                var startIndex = x.IndexOf('<');
+            x => RandomString(x)
+            );
 
-                if (startIndex != -1)
-                {
-                    var count = x.Length - startIndex;
+        var methodArgumentDictionary = methodArguments
+            .ToDictionary(
+                x => x,
+                x => RandomString(x)
+                );
 
-                    x = x.Remove(startIndex, count);    
-                }                
-                
-                x = x.Split('.').Last();
-                
-                var txtInfo = new CultureInfo("en-us", false).TextInfo;
+        var combinedServices = services.Concat(methodArgumentDictionary);
 
-                return txtInfo.ToTitleCase(x);
-            });
-        
         _builder.Append($$"""
                                          
-                                         
                                       group.Map{{httpMethod}}("{{endpoint}}", ({{
-                                          string.Join(", ", services.Select(x => $"{x.Key} {x.Value}"))
+                                          string.Join(", ", combinedServices.Select(x => $"{x.Key} {x.Value}"))
                                       }}) => {
                                           var controller = new {{
                                               _currentController
@@ -71,7 +64,9 @@ public class MinimalApiClassBuilder
                                               string.Join(", ", services.Values)
                                           }});
                                         
-                                          return controller.{{methodName}}();
+                                          return controller.{{methodName}}({{
+                                              string.Join(", ", methodArgumentDictionary.Values)
+                                          }});
                                       });
                           """);
         return this;
@@ -79,5 +74,16 @@ public class MinimalApiClassBuilder
     
     public string Build() =>
         _builder.AppendLine("\n\t\t\treturn app;\n\t\t}\n\t}\n}").ToString();
-    
+
+    private static string RandomString(string input, int length = 32)
+    {
+        var random = new Random(Seed: input.GetHashCode());
+        const string chars = "abcdefghijklmnopqrstuvwxyz";
+        return new string(
+            Enumerable
+                .Repeat(chars, length)
+            .Select(s => s[random
+                    .Next(s.Length)])
+                .ToArray());
+    }
 }
