@@ -1,9 +1,11 @@
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication1.Controllers;
 
 [Route("[controller]")]
+[ApiController]
 public class WeatherForecastController
 {
     private static readonly string[] Summaries = new[]
@@ -39,11 +41,6 @@ public class HttpGetAttribute : HttpMethodAttribute
         : base(_supportedMethods)
     {
     }
-    
-    public HttpGetAttribute([StringSyntax("Route")] string template)
-        : base(_supportedMethods, template)
-    {
-    }
 }
 
 public abstract class HttpMethodAttribute : Attribute
@@ -57,13 +54,8 @@ public abstract class HttpMethodAttribute : Attribute
     private readonly List<string> _httpMethods;
 
     private int? _order;
-    
-    public HttpMethodAttribute(IEnumerable<string> httpMethods)
-        : this(httpMethods, null)
-    {
-    }
-    
-    public HttpMethodAttribute(IEnumerable<string> httpMethods, [StringSyntax("Route")] string? template)
+
+    public HttpMethodAttribute(IEnumerable<string> httpMethods, [StringSyntax("Route")] string? template = null)
     {
         if (httpMethods == null)
         {

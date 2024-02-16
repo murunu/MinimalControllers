@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using MinimalControllers;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -24,6 +25,8 @@ todosApi.MapGet("/{id}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
         ? Results.Ok(todo)
         : Results.NotFound());
+
+app.UseControllers();
 
 app.Run();
 
