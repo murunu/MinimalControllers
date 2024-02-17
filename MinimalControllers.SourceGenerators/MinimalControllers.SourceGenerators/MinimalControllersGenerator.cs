@@ -20,6 +20,9 @@ public class MinimalControllersGenerator : IIncrementalGenerator
 
         // Add the ApiController attribute to the compilation.
         HttpAttributeDefinitions.AddApiControllerAttributesToCompilation(context);
+        
+        // Add the Route attribute to the compilation
+        HttpAttributeDefinitions.AddRouteAttributesToCompilation(context);
 
         // Filter classes annotated with the [ApiController] attribute. Only filtered Syntax Nodes can trigger code generation.
         var provider = context.SyntaxProvider
@@ -63,6 +66,8 @@ public class MinimalControllersGenerator : IIncrementalGenerator
         foreach (var classDeclarationSyntax in classDeclarations)
         {
             var controllerName = GetControllerName(compilation, classDeclarationSyntax);
+            var controllerRoute = GetControllerRoute(compilation, classDeclarationSyntax);
+            
             var controllerServices = GetControllerServices(compilation, classDeclarationSyntax).ToList();
             
             if (string.IsNullOrEmpty(controllerName))
@@ -70,7 +75,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
 
             var methods = GetHttpMethods(compilation, classDeclarationSyntax);
 
-            source.AddGroup(controllerName);
+            source.AddGroup(controllerName, controllerRoute);
 
             foreach (var method in methods)
             {
@@ -95,6 +100,11 @@ public class MinimalControllersGenerator : IIncrementalGenerator
     {
         return $"{NamespaceHelper.GetNamespace(compilation, classDeclarationSyntax)}.{classDeclarationSyntax.Identifier.Text}";
     }
+    
+    private static string GetControllerRoute(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        return GetArgumentValue(compilation, classDeclarationSyntax, HttpAttributeDefinitions.RouteWithNamespace, 0);
+    }
 
     private static IEnumerable<string> GetControllerServices(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
         => classDeclarationSyntax
@@ -103,22 +113,18 @@ public class MinimalControllersGenerator : IIncrementalGenerator
             .SelectMany(constructor => constructor.ParameterList.Parameters)
             .Select(parameter => NamespaceHelper.GetNamespace(compilation, parameter));
 
-    private static string GetControllerEndpoint(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, string argumentName)
+    private static string GetArgumentValue(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, string attributeName, int argumentIndex)
     {
-        foreach (var attribute in GetAttributesByList(compilation, classDeclarationSyntax, HttpAttributeDefinitions.ControllerTypes))
+        foreach (var attribute in GetAttributesByList(compilation, classDeclarationSyntax, [attributeName]))
         {
             if (attribute.ArgumentList == null)
                 continue;
 
-            foreach (var argument in attribute.ArgumentList.Arguments)
+            if (attribute.ArgumentList.Arguments.Count <= argumentIndex) 
+                continue;
+            if (attribute.ArgumentList.Arguments[argumentIndex].Expression is LiteralExpressionSyntax literalExpression)
             {
-                if (argument.NameEquals == null || argument.NameEquals.Name.Identifier.Text != argumentName)
-                    continue;
-
-                if (argument.Expression is LiteralExpressionSyntax literalExpression)
-                {
-                    return literalExpression.Token.ValueText;
-                }
+                return literalExpression.Token.ValueText;
             }
         }
 
@@ -137,7 +143,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
                 x => x.Method,
                 x => x.HttpMethods
                     .Select(y => y.Name
-                        .ToString().Replace("Http", ""))
+                        .ToString().Split('.').Last().Replace("Http", ""))
                     .ToArray());
     
     private static IEnumerable<string> GetMethodArguments(BaseMethodDeclarationSyntax method)

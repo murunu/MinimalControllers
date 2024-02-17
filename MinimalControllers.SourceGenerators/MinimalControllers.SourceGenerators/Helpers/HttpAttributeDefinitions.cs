@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -21,14 +22,18 @@ public static class HttpAttributeDefinitions
         "Controller", 
         "ApiController"
     ];
+    
+    public const string Route = "Route";
 
 
     public static readonly string[] HttpMethodsWithNamespace = HttpMethods.Select(x => $"{Namespace}.{x}").ToArray();
     public static readonly string[] ControllerTypesWithNamespace = ControllerTypes.Select(x => $"{Namespace}.{x}").ToArray();
-
+    public const string RouteWithNamespace = $"{Namespace}.{Route}";
+    
     private static Dictionary<string, string> GetAttributes(
         IEnumerable<string> attributeNames, 
-        params System.AttributeTargets[] attributeTargets) =>
+        IEnumerable<string> ctorArguments,
+        params AttributeTargets[] attributeTargets) =>
         attributeNames
             .ToDictionary(
                 name => name,
@@ -42,16 +47,22 @@ public static class HttpAttributeDefinitions
                                     }}, Inherited = false, AllowMultiple = false)]
                                     public sealed class {{name}}Attribute : System.Attribute
                                     {
+                                        public {{name}}Attribute({{
+                                            string.Join(", ", ctorArguments)
+                                        }})
+                                        {
+                                        }
                                     }
                                 }
                                 """);
     
     private static void AddAttributesFromNames(
         IEnumerable<string> attributeNames, 
+        IEnumerable<string> ctorArguments,
         IncrementalGeneratorInitializationContext context, 
-        params System.AttributeTargets[] attributeTargets)
+        params AttributeTargets[] attributeTargets)
     {
-        foreach (var item in GetAttributes(attributeNames, attributeTargets))
+        foreach (var item in GetAttributes(attributeNames, ctorArguments, attributeTargets))
         {
             context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
                 $"{item.Key}.g.cs",
@@ -60,8 +71,11 @@ public static class HttpAttributeDefinitions
     }
     
     public static void AddHttpAttributesToCompilation(IncrementalGeneratorInitializationContext context)
-        => AddAttributesFromNames(HttpMethods, context, System.AttributeTargets.Method);
+        => AddAttributesFromNames(HttpMethods, [], context, AttributeTargets.Method);
 
     public static void AddApiControllerAttributesToCompilation(IncrementalGeneratorInitializationContext context)
-        => AddAttributesFromNames(ControllerTypes, context, System.AttributeTargets.Class);
+        => AddAttributesFromNames(ControllerTypes, [], context, AttributeTargets.Class);
+
+    public static void AddRouteAttributesToCompilation(IncrementalGeneratorInitializationContext context)
+        => AddAttributesFromNames([Route], ["string name"], context, AttributeTargets.Class);
 }
