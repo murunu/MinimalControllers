@@ -1,11 +1,13 @@
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication1.Controllers;
 
 [Route("[controller]")]
 [ApiController]
+[Authorize]
 public class WeatherForecastController
 {
     private static readonly string[] Summaries = new[]

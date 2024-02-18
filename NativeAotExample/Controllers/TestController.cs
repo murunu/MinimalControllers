@@ -24,9 +24,9 @@ public class TestController : Microsoft.AspNetCore.Mvc.Controller
         return "Hello World!";
     }
 
-    [MinimalControllers.HttpPut]
-    public string Test3()
+    [MinimalControllers.HttpGet]
+    public IActionResult Test3()
     {
-        return "";
+        return Challenge();
     }
 }
