@@ -23,6 +23,9 @@ public class MinimalControllersGenerator : IIncrementalGenerator
         
         // Add the Route attribute to the compilation
         HttpAttributeDefinitions.AddRouteAttributesToCompilation(context);
+        
+        // Add the extensions to the compilation
+        Extensions.AddConvertToIResultMethod(context);
 
         // Filter classes annotated with the [ApiController] attribute. Only filtered Syntax Nodes can trigger code generation.
         var provider = context.SyntaxProvider

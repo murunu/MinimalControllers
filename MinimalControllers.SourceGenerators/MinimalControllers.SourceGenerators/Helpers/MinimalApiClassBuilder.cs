@@ -11,6 +11,7 @@ public class MinimalApiClassBuilder
     private const string ClassName = "MinimalController";
     private string _currentController = "";
     private string _currentControllerName = "";
+    private bool _currentControllerHasAction = false;
     
     private string GetGroupVariableName() => _currentController.Split('.').Last().ToLower() + "Group";
     
@@ -65,7 +66,10 @@ public class MinimalApiClassBuilder
                 x => RandomString(x)
                 );
 
-        var combinedServices = services.Concat(methodArgumentDictionary);
+        var combinedServices = services
+            .Select(x => $"[Microsoft.AspNetCore.Mvc.FromServicesAttribute]{x.Key} {x.Value}")
+            .Concat(methodArgumentDictionary
+                .Select(x => $"{x.Key} {x.Value}"));
 
         _builder.Append($$"""
                                          
@@ -73,17 +77,22 @@ public class MinimalApiClassBuilder
                                       {{
                                           GetGroupVariableName()
                                       }}.Map{{httpMethod}}("{{endpoint}}", ({{
-                                          string.Join(", ", combinedServices.Select(x => $"{x.Key} {x.Value}"))
+                                          string.Join(",\n\t\t\t\t", combinedServices)
                                       }}) => {
                                           var controller = new {{
                                               _currentController
                                           }}({{
-                                              string.Join(", ", services.Values)
+                                              string.Join(",\n\t\t\t\t", services.Values)
                                           }});
                                         
-                                          return controller.{{methodName}}({{
-                                              string.Join(", ", methodArgumentDictionary.Values)
+                                          var result = controller.{{methodName}}({{
+                                              string.Join(",\n\t\t\t\t", methodArgumentDictionary.Values)
                                           }});
+                                          
+                                          if(MinimalControllers.Converters.TryConvertToIResult(result, out var iResult))
+                                              return iResult;
+                                          
+                                          return Microsoft.AspNetCore.Http.Results.Ok(result);
                                       });
                           """);
         return this;
@@ -96,11 +105,19 @@ public class MinimalApiClassBuilder
     {
         var random = new Random(Seed: input.GetHashCode());
         const string chars = "abcdefghijklmnopqrstuvwxyz";
-        return new string(
+        return $"{NormalizeName(input)}_{new string(
             Enumerable
                 .Repeat(chars, length)
-            .Select(s => s[random
+                .Select(s => s[random
                     .Next(s.Length)])
-                .ToArray());
+                .ToArray())}";
     }
+    
+    private static string NormalizeName(string name) =>
+        name
+            .Split('.')
+            .Last()
+            .Split('<')
+            .First()
+            .ToLower(CultureInfo.InvariantCulture);
 }
