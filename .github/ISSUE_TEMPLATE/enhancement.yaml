@@ -1,0 +1,29 @@
+﻿name: Enhancement
+description: Enhancement
+title: "[Enhancement]: "
+labels: [ "enhancement" ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please give us a description of the enhancement
+      value: As a [user role], I'd like to [improvement description], in order to [value this improvement adds].
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: What is the priority of this enhancement
+      options:
+        - Low
+        - Medium
+        - High
+      default: 0
+    validations:
+      required: true
