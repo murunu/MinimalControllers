@@ -8,13 +8,13 @@ public class RandomController
 {
     private readonly Random _random;
     
-    public RandomController(ILogger<RandomController> logger, Random random)
+    public RandomController(Random random)
     {
         _random = random;
     }
     
     [HttpGet]
-    public async Task<string> GetRandomNumber(string seed)
+    public string GetRandomNumber()
     {
         return _random.Next().ToString();
     }

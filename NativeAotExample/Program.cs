@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 using MinimalControllers;
 
 var builder = WebApplication.CreateSlimBuilder(args);
@@ -7,6 +8,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
 });
+
+builder.Services.AddScoped(_ => new Random());
 
 var app = builder.Build();
 

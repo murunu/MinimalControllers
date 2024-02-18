@@ -1,30 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using NativeAotExample.Model;
 
 namespace NativeAotExample.Controllers;
 
 [MinimalControllers.ApiController]
+[MinimalControllers.Route("[controller]/works")]
 public class TestController : Microsoft.AspNetCore.Mvc.Controller
 {
-    public TestController(ILogger<TestController> logger, WeatherForecast weatherForecast)
+    public TestController()
     {
-        
     }
-    
+
     [MinimalControllers.HttpGet]
-    public async Task<IActionResult> Test(string test)
+    public IActionResult Test()
     {
-        return Ok(test);
+        return Ok();
     }
-    
+
     [MinimalControllers.HttpGet]
-    public async Task<string> Test2()
+    public string Test2()
     {
         return "Hello World!";
     }
 
     [MinimalControllers.HttpPut]
-    public async Task<string> Test3()
+    public string Test3()
     {
         return "";
     }
