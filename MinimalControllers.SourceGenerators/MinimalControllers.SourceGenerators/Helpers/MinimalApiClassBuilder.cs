@@ -32,10 +32,10 @@ public class MinimalApiClassBuilder
 
         if (string.IsNullOrEmpty(endpoint))
         {
-            endpoint = _currentController;
+            endpoint = _currentControllerName;
         }
 
-        endpoint = endpoint.ToLower().Replace("[controller]", _currentControllerName);
+        endpoint = endpoint.ToLower().Replace("[controller]", _currentControllerName).Replace("[action]", "");
 
         if (!endpoint.StartsWith("/"))
             endpoint = $"/{endpoint}";
@@ -54,7 +54,7 @@ public class MinimalApiClassBuilder
         
         if(string.IsNullOrEmpty(_currentController))
             throw new InvalidOperationException("You must call AddGroup before adding an endpoint.");
-
+        
         var services = controllerServices.ToDictionary(
             x => x,
             x => RandomString(x)
@@ -115,6 +115,8 @@ public class MinimalApiClassBuilder
     
     private static string NormalizeName(string name) =>
         name
+            .Split(' ')
+            .Last()
             .Split('.')
             .Last()
             .Split('<')

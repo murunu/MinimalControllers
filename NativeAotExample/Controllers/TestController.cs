@@ -29,4 +29,10 @@ public class TestController : Microsoft.AspNetCore.Mvc.Controller
     {
         return Challenge();
     }
+
+    [MinimalControllers.HttpGet]
+    public IActionResult Test4([FromHeader(Name = "banana")] string header, [FromBody] string banana, [FromRoute] string apple, [FromServices] string lol)
+    {
+        return BadRequest();
+    }
 }

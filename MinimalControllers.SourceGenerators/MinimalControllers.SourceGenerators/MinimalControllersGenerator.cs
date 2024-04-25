@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -52,11 +53,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
         return classDeclarationSyntax
             .AttributeLists
             .SelectMany(attributeListSyntax => attributeListSyntax.Attributes)
-            .Any(attributeSyntax => HttpAttributeDefinitions
-                .ControllerTypesWithNamespace
-                .Any(name =>
-                    name
-                        .Equals(NamespaceHelper.GetNamespace(context.SemanticModel, attributeSyntax))))
+            .Any(syntax => AttributeEndsWithAny(syntax.ToString(), HttpAttributeDefinitions.ControllerTypes))
             ? (classDeclarationSyntax, true)
             : (classDeclarationSyntax, false);
     }
@@ -87,7 +84,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
                 {
                     source.AddEndpoint(
                         httpMethod, 
-                        $"/{method.Key.Identifier.Text}", 
+                        GetMethodEndpoint(method.Key, httpMethod), 
                         method.Key.Identifier.Text,
                         controllerServices,
                         methodArguments);
@@ -99,6 +96,21 @@ public class MinimalControllersGenerator : IIncrementalGenerator
         context.AddSource("UseControllers.g.cs", SourceText.From(source.Build(), Encoding.UTF8));
     }
 
+    private static string GetMethodEndpoint(MethodDeclarationSyntax methodDeclarationSyntax, string httpMethod)
+    {
+        var attribute = methodDeclarationSyntax.AttributeLists.FirstOrDefault(x => AttributeEndsWithAny(x.ToString(), [httpMethod]))?.Attributes.FirstOrDefault();
+        
+        if(attribute?.ArgumentList?.Arguments.FirstOrDefault()?.Expression is not LiteralExpressionSyntax literalExpressionSyntax)
+            return $"/{methodDeclarationSyntax.Identifier.Text}";
+
+        var endpoint = literalExpressionSyntax.Token.ValueText;
+
+        if (!endpoint.StartsWith("/"))
+            endpoint = $"/{endpoint}";
+        
+        return endpoint;
+    }
+
     private static string GetControllerName(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
     {
         return $"{NamespaceHelper.GetNamespace(compilation, classDeclarationSyntax)}.{classDeclarationSyntax.Identifier.Text}";
@@ -106,7 +118,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
     
     private static string GetControllerRoute(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
     {
-        return GetArgumentValue(compilation, classDeclarationSyntax, HttpAttributeDefinitions.RouteWithNamespace, 0);
+        return GetArgumentValue(compilation, classDeclarationSyntax, HttpAttributeDefinitions.Route, 0);
     }
 
     private static IEnumerable<string> GetControllerServices(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
@@ -139,7 +151,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
             .Select(method => new
             {
                 Method = method,
-                HttpMethods = GetAttributesByList(compilation, method, HttpAttributeDefinitions.HttpMethodsWithNamespace)
+                HttpMethods = GetAttributesByList(compilation, method, HttpAttributeDefinitions.HttpMethods)
             })
             .Where(x => x.HttpMethods.Any())
             .ToDictionary(
@@ -153,7 +165,27 @@ public class MinimalControllersGenerator : IIncrementalGenerator
         => method
             .ParameterList
             .Parameters
-            .Select(parameter => parameter.Type.ToString());
+            .Select(GetMethodArgumentName);
+
+    private static string GetMethodArgumentName(ParameterSyntax parameterSyntax)
+    {
+        var result = parameterSyntax
+            .AttributeLists
+            .Aggregate("", (current, item) => current + GetMethodArgumentAttributeName(item.ToString()));
+
+        return $"{result} {parameterSyntax.Type}";
+    }
+    private static string GetMethodArgumentAttributeName(string attribute)
+    {
+        attribute = attribute.Replace("[", "").Replace("]", "").Split('.').Last();
+
+        if (!attribute.Any(x => x.Equals('(')))
+        {
+            return $"[Microsoft.AspNetCore.Mvc.{attribute}Attribute]";
+        }
+
+        return $"[Microsoft.AspNetCore.Mvc.{attribute.Split('(').First()}Attribute({attribute.Split('(').Last()}]";
+    }
 
     private static IEnumerable<AttributeSyntax> GetAttributesByList(Compilation compilation, MemberDeclarationSyntax classDeclarationSyntax,
         IEnumerable<string> names)
@@ -161,8 +193,10 @@ public class MinimalControllersGenerator : IIncrementalGenerator
             .AttributeLists
             .SelectMany(attributeList => attributeList.Attributes)
             .Where(attribute =>
-                names.Any(
-                    name =>
-                        name.Equals(
-                            NamespaceHelper.GetNamespace(compilation, attribute))));
+                AttributeEndsWithAny(attribute.ToString(), names));
+    
+    private static bool AttributeEndsWithAny(string attribute, IEnumerable<string> names)
+    {
+        return names.Any(name => attribute.Split('(').First().EndsWith(name, StringComparison.OrdinalIgnoreCase));
+    }
 }

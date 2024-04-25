@@ -18,4 +18,10 @@ public class RandomController
     {
         return _random.Next().ToString();
     }
+
+    [Microsoft.AspNetCore.Mvc.HttpGet]
+    public string GetAnotherThing()
+    {
+        return string.Empty;
+    }
 }

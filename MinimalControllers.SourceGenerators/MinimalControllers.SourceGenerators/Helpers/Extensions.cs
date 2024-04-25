@@ -53,22 +53,22 @@ public static class Extensions
                             result = Microsoft.AspNetCore.Http.Results.Ok(jsonResult.Value);
                             return true;
                         case Microsoft.AspNetCore.Mvc.AcceptedResult acceptedResult:
-                            result = Microsoft.AspNetCore.Http.Results.StatusCode(acceptedResult.StatusCode);
+                            result = Microsoft.AspNetCore.Http.Results.StatusCode(acceptedResult.StatusCode ?? 200);
                             return true;
                         case Microsoft.AspNetCore.Mvc.AcceptedAtActionResult acceptedAtActionResult:
-                            result = Microsoft.AspNetCore.Http.Results.StatusCode(acceptedAtActionResult.StatusCode);
+                            result = Microsoft.AspNetCore.Http.Results.StatusCode(acceptedAtActionResult.StatusCode ?? 200);
                             return true;
                         case Microsoft.AspNetCore.Mvc.AcceptedAtRouteResult acceptedAtRouteResult:
-                            result = Microsoft.AspNetCore.Http.Results.StatusCode(acceptedAtRouteResult.StatusCode);
+                            result = Microsoft.AspNetCore.Http.Results.StatusCode(acceptedAtRouteResult.StatusCode ?? 200);
                             return true;
                         case Microsoft.AspNetCore.Mvc.CreatedAtActionResult createdAtActionResult:
-                            result = Microsoft.AspNetCore.Http.Results.StatusCode(createdAtActionResult.StatusCode);
+                            result = Microsoft.AspNetCore.Http.Results.StatusCode(createdAtActionResult.StatusCode ?? 200);
                             return true;
                         case Microsoft.AspNetCore.Mvc.CreatedAtRouteResult createdAtRouteResult:
-                            result = Microsoft.AspNetCore.Http.Results.StatusCode(createdAtRouteResult.StatusCode);
+                            result = Microsoft.AspNetCore.Http.Results.StatusCode(createdAtRouteResult.StatusCode ?? 200);
                             return true;
                         case Microsoft.AspNetCore.Mvc.CreatedResult createdResult:
-                            result = Microsoft.AspNetCore.Http.Results.StatusCode(createdResult.StatusCode);
+                            result = Microsoft.AspNetCore.Http.Results.StatusCode(createdResult.StatusCode ?? 200);
                             return true;
                         case Microsoft.AspNetCore.Mvc.NoContentResult noContentResult:
                             result = Microsoft.AspNetCore.Http.Results.StatusCode(noContentResult.StatusCode);
