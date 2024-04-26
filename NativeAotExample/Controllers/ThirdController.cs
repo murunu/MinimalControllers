@@ -10,9 +10,9 @@ public class ThirdController : Controller
     {
     }
     
-    [HttpGet("/banana/{id}")]
-    public IActionResult GetAll([FromServices] Random random)
+    [HttpGet("/banana/{max:int}")]
+    public IActionResult GetAll([FromServices] Random random, [FromRoute(Name = "max")] int max)
     {
-        return Ok();
+        return Ok($"Test, {random.Next(0, max)}");
     }
 }

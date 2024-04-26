@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
 using MinimalControllers;
+using Microsoft.AspNetCore.OpenApi;
+using NativeAotExample.Controllers;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -9,9 +10,15 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped(_ => new Random());
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 var sampleTodos = new Todo[]
 {
@@ -29,7 +36,7 @@ todosApi.MapGet("/{id}", (int id) =>
         ? Results.Ok(todo)
         : Results.NotFound());
 
-app.UseControllers();
+// app.UseControllers();
 
 app.Run();
 

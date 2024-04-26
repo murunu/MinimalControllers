@@ -79,7 +79,7 @@ public class MinimalControllersGenerator : IIncrementalGenerator
 
             foreach (var method in methods)
             {
-                var methodArguments = GetMethodArguments(method.Key).ToList();
+                var methodArguments = GetMethodArguments(compilation, method.Key).ToList();
                 foreach (var httpMethod in method.Value)
                 {
                     source.AddEndpoint(
@@ -87,7 +87,8 @@ public class MinimalControllersGenerator : IIncrementalGenerator
                         GetMethodEndpoint(method.Key, httpMethod), 
                         method.Key.Identifier.Text,
                         controllerServices,
-                        methodArguments);
+                        methodArguments,
+                        method.Key.Modifiers.Any(SyntaxKind.AsyncKeyword));
                 }
             }
         }
@@ -161,19 +162,19 @@ public class MinimalControllersGenerator : IIncrementalGenerator
                         .ToString().Split('.').Last().Replace("Http", ""))
                     .ToArray());
     
-    private static IEnumerable<string> GetMethodArguments(BaseMethodDeclarationSyntax method)
+    private static IEnumerable<string> GetMethodArguments(Compilation compilation, BaseMethodDeclarationSyntax method)
         => method
             .ParameterList
             .Parameters
-            .Select(GetMethodArgumentName);
+            .Select(x => GetMethodArgumentName(compilation, x));
 
-    private static string GetMethodArgumentName(ParameterSyntax parameterSyntax)
+    private static string GetMethodArgumentName(Compilation compilation, ParameterSyntax parameterSyntax)
     {
         var result = parameterSyntax
             .AttributeLists
             .Aggregate("", (current, item) => current + GetMethodArgumentAttributeName(item.ToString()));
 
-        return $"{result} {parameterSyntax.Type}";
+        return $"{result} {NamespaceHelper.GetNamespace(compilation, parameterSyntax)}";
     }
     private static string GetMethodArgumentAttributeName(string attribute)
     {
@@ -197,6 +198,16 @@ public class MinimalControllersGenerator : IIncrementalGenerator
     
     private static bool AttributeEndsWithAny(string attribute, IEnumerable<string> names)
     {
-        return names.Any(name => attribute.Split('(').First().EndsWith(name, StringComparison.OrdinalIgnoreCase));
+        return names.Any(name =>
+        {
+            var result = attribute.Split('(').FirstOrDefault();
+            
+            if(string.IsNullOrEmpty(result))
+            {
+                return false;
+            }
+            
+            return result.EndsWith(name, StringComparison.OrdinalIgnoreCase);
+        });
     }
 }

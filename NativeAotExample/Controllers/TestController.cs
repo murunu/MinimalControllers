@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using NativeAotExample.Model;
 
@@ -8,13 +8,14 @@ namespace NativeAotExample.Controllers;
 [MinimalControllers.Route("[controller]/works")]
 public class TestController : Microsoft.AspNetCore.Mvc.Controller
 {
-    public TestController()
+    public TestController(HttpClient httpClient)
     {
     }
 
     [MinimalControllers.HttpGet]
-    public IActionResult Test()
+    public IActionResult Test([FromServices]Random random)
     {
+        var number = random.Next();
         return Ok();
     }
 
@@ -30,8 +31,8 @@ public class TestController : Microsoft.AspNetCore.Mvc.Controller
         return Challenge();
     }
 
-    [MinimalControllers.HttpGet]
-    public IActionResult Test4([FromHeader(Name = "banana")] string header, [FromBody] string banana, [FromRoute] string apple, [FromServices] string lol)
+    [HttpGet("/{apple}")]
+    public async Task<IActionResult> Test4([FromHeader(Name = "banana")] string header, [FromBody] string banana, [FromRoute(Name = "apple")] string apple, [FromServices] string lol)
     {
         return BadRequest();
     }
