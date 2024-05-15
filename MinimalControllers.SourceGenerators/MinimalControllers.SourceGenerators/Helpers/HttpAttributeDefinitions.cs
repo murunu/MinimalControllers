@@ -71,7 +71,7 @@ public static class HttpAttributeDefinitions
     }
     
     public static void AddHttpAttributesToCompilation(IncrementalGeneratorInitializationContext context)
-        => AddAttributesFromNames(HttpMethods, [], context, AttributeTargets.Method);
+        => AddAttributesFromNames(HttpMethods, ["string name = \"\""], context, AttributeTargets.Method);
 
     public static void AddApiControllerAttributesToCompilation(IncrementalGeneratorInitializationContext context)
         => AddAttributesFromNames(ControllerTypes, [], context, AttributeTargets.Class);
