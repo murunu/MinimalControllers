@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MinimalControllers.SourceGenerators.Helpers;
@@ -13,15 +14,21 @@ public static class NamespaceHelper
         return symbol.ToDisplayString();
     }
     
+    public static string GetNamespace(Compilation compilation, MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+    {
+        var semanticModel = compilation.GetSemanticModel(memberAccessExpressionSyntax.SyntaxTree);
+
+        var symbol = semanticModel.GetSymbolInfo(memberAccessExpressionSyntax).Symbol.ContainingNamespace;
+        return symbol.ToDisplayString();
+    }
+    
     public static string GetNamespace(SemanticModel semanticModel, AttributeSyntax classDeclarationSyntax)
     {
         try
         {
             var symbol = semanticModel.GetSymbolInfo(classDeclarationSyntax).Symbol;
 
-            return classDeclarationSyntax.Name.ToString().StartsWith(symbol.ContainingNamespace.Name) 
-                ? classDeclarationSyntax.Name.ToString() 
-                : $"{symbol.ContainingNamespace.Name}.{classDeclarationSyntax.Name}";
+            return $"{symbol.ContainingNamespace}.{classDeclarationSyntax.Name.ToString().Split('.').Last()}";
         }
         catch
         {

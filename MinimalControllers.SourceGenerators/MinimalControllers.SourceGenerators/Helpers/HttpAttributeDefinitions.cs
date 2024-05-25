@@ -55,6 +55,13 @@ public static class HttpAttributeDefinitions
                                     }
                                 }
                                 """);
+
+    private static void AddAttributesFromNames(
+        string attributeName,
+        IEnumerable<string> ctorArguments,
+        IncrementalGeneratorInitializationContext context,
+        params AttributeTargets[] attributeTargets)
+        => AddAttributesFromNames([attributeName], ctorArguments, context, attributeTargets);
     
     private static void AddAttributesFromNames(
         IEnumerable<string> attributeNames, 
@@ -77,5 +84,8 @@ public static class HttpAttributeDefinitions
         => AddAttributesFromNames(ControllerTypes, [], context, AttributeTargets.Class);
 
     public static void AddRouteAttributesToCompilation(IncrementalGeneratorInitializationContext context)
-        => AddAttributesFromNames([Route], ["string name"], context, AttributeTargets.Class);
+        => AddAttributesFromNames(Route, ["string name"], context, AttributeTargets.Class);
+
+    public static void AddMinimalConverterAttributeToCompilation(IncrementalGeneratorInitializationContext context)
+        => AddAttributesFromNames("MinimalConverter", [], context, AttributeTargets.Method);
 }
