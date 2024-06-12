@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebAppli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalControllers.SourceGenerators", "MinimalControllers.SourceGenerators\MinimalControllers.SourceGenerators\MinimalControllers.SourceGenerators.csproj", "{C7F37E2A-E4C2-4D67-B69F-F667BCE75E85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalControllers.SourceGenerators.Sample", "MinimalControllers.SourceGenerators\MinimalControllers.SourceGenerators.Sample\MinimalControllers.SourceGenerators.Sample.csproj", "{4E10C928-9539-4C39-98BD-7CDD1E92E8F5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalControllers.SourceGenerators.Tests", "MinimalControllers.SourceGenerators\MinimalControllers.SourceGenerators.Tests\MinimalControllers.SourceGenerators.Tests.csproj", "{B6395F90-90F1-4650-AFB8-9352D2E08D5E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerators", "SourceGenerators", "{F0C1FD4D-C80F-40AC-9441-17FAF512A7C5}"
@@ -32,10 +30,6 @@ Global
 		{C7F37E2A-E4C2-4D67-B69F-F667BCE75E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7F37E2A-E4C2-4D67-B69F-F667BCE75E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7F37E2A-E4C2-4D67-B69F-F667BCE75E85}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E10C928-9539-4C39-98BD-7CDD1E92E8F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E10C928-9539-4C39-98BD-7CDD1E92E8F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E10C928-9539-4C39-98BD-7CDD1E92E8F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E10C928-9539-4C39-98BD-7CDD1E92E8F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B6395F90-90F1-4650-AFB8-9352D2E08D5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B6395F90-90F1-4650-AFB8-9352D2E08D5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6395F90-90F1-4650-AFB8-9352D2E08D5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
