@@ -4,8 +4,12 @@
 name: Publish .NET to Nuget
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch: 
+    inputs: 
+        version:
+            description: 'Version to publish'
+            required: true
+            default: '0.0.0'
 
 jobs:
   build:
@@ -23,17 +27,7 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-
-  publish:
-    name: Pack & Publish
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Publish on version change
-      id: publish_nuget
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: MinimalControllers.SourceGenerators/MinimalControllers.SourceGenerators/MinimalControllers.SourceGenerators.csproj
-        BUILD_CONFIGURATION: Release
-        PACKAGE_NAME: Murunu.MinimalControllers
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Publish
+      run: dotnet pack MinimalControllers.SourceGenerators/MinimalControllers.SourceGenerators/MinimalControllers.SourceGenerators.csproj -o ./Output --no-build --configuration Release /p:Version=${{ github.event.inputs.version }}
+    - name: Publish to Nuget
+      run: dotnet nuget push ./Output/Murunu.MinimalControllers.${{ github.event.inputs.version }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}

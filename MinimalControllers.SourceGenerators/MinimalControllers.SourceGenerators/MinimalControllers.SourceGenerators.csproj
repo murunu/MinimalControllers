@@ -13,11 +13,14 @@
         <RootNamespace>MinimalControllers.SourceGenerators</RootNamespace>
         <PackageId>Murunu.MinimalControllers</PackageId>
         <Version>1.0.21</Version>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         
         <LangVersion>Preview</LangVersion>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
