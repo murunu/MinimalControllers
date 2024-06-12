@@ -16,7 +16,9 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-
+        <RepositoryUrl>https://github.com/murunu/MinimalControllers</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>
     

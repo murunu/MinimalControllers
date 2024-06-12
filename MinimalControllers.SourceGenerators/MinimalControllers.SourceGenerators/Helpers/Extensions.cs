@@ -217,19 +217,11 @@ public static class Extensions
                         case Microsoft.AspNetCore.Mvc.FileResult fileResult:
                             result = Microsoft.AspNetCore.Http.Results.File(fileResult.FileDownloadName);
                             return true;
-                        //case Amazon.Lambda.Annotations.APIGateway.HttpResults httpResults:
-                          //  result = Microsoft.AspNetCore.Http.Results.Json(
-                            //    GetRawHttpResultsBody(httpResults), 
-                              //  statusCode: (int)httpResults.StatusCode);
-                            //return true;
                         default:
                             result = null;
                             return false;
                     }
                 }
-                
-                //[System.Runtime.CompilerServices.UnsafeAccessor(System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "_rawBody")]
-                //extern static ref object GetRawHttpResultsBody(Amazon.Lambda.Annotations.APIGateway.HttpResults @this);
             }
         }
         """;
