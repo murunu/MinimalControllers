@@ -13,12 +13,15 @@
         <RootNamespace>MinimalControllers.SourceGenerators</RootNamespace>
         <PackageId>Murunu.MinimalControllers</PackageId>
         <Version>1.0.21</Version>
+        <Description>
+            Source generator to create minimal API endpoints from MVC controllers.
+        </Description>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/murunu/MinimalControllers</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        
+
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>
     
