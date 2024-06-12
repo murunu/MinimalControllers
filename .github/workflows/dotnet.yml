@@ -24,9 +24,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -c Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal -c Release
     - name: Publish
       run: dotnet pack MinimalControllers.SourceGenerators/MinimalControllers.SourceGenerators/MinimalControllers.SourceGenerators.csproj -o ./Output --no-build --configuration Release /p:Version=${{ github.event.inputs.version }}
     - name: Publish to Nuget
