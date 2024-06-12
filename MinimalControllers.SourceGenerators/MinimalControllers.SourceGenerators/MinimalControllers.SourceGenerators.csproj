@@ -15,7 +15,8 @@
         <Version>1.0.21</Version>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>
     
@@ -35,5 +36,9 @@
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
               PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 </Project>
